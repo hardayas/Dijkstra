@@ -108,7 +108,7 @@ int game_dijkstra_search(const game_info_t* info,
 
 
 	//While no solution found
-    while (SEARCH_IN_PROGRESS) {
+    while (SEARCH_IN_PROGRESS) {		
 
 		//Remove node from Queue, in order to generate its successors
 				if(heapq_empty(&pq)){
@@ -141,9 +141,9 @@ int game_dijkstra_search(const game_info_t* info,
 								game_make_move(info, &child->state, color, dir);
 
 								//Remove node if new position creates a deadend (uncomment code below)
-								if(g_options.node_check_deadends && game_check_deadends(info,&child->state) == 1){
+								if(g_options.node_check_deadends
+									&& game_check_deadends(info,&child->state) == 1){
 									free(child);
-									//printf("deadend\n" );
 									continue;
 
 								}

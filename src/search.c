@@ -110,54 +110,56 @@ int game_dijkstra_search(const game_info_t* info,
 	//While no solution found
     while (SEARCH_IN_PROGRESS) {		
 
-		//Remove node from Queue, in order to generate its successors
-				if(heapq_empty(&pq)){
-					result = SEARCH_UNREACHABLE;
-					break;
-				}
+                                //Remove node from Queue,
+        if(heapq_empty(&pq)){   //in order to generate its successors
+            result = SEARCH_UNREACHABLE;
+            break;
+        }
 
-				node = heapq_deque(&pq);
-				//Get next color to explore its 4 directions
-	        //(use game_next_move_color function in engine.h)
+        node = heapq_deque(&pq);
+                                //Get next color to explore its 4 directions
+                                //(use game_next_move_color function in engine.h)
         int color = game_next_move_color(info, &node->state);
 
         int dir, NUM_DIRS = 4;
         for(dir = 0; dir < NUM_DIRS; dir++) {
-						//Check move in that direction is possible
-						//Within the rules of the game (see engine.h)
+                                //Check move in that direction is possible
+                                //Within the rules of the game (see engine.h)
             if(game_can_move(info, &node->state, color, dir)) {
 
 								//Create child node
                 tree_node_t* child = node_create(node, info, &node->state);
 
-								//In no more space in memory, end search (more nodes in pq than max_nodes)
-								if(heapq_count(&pq) > max_nodes) {
-									result = SEARCH_FULL;
-									break;
-								}
+								//In no more space in memory, end search
+                                //(more nodes in pq than max_nodes)
+                    if(heapq_count(&pq) > max_nodes) {
+                        result = SEARCH_FULL;
+                        break;
+                    }
 
 
 								//Update child state given the direction
-								game_make_move(info, &child->state, color, dir);
+                    game_make_move(info, &child->state, color, dir);
 
-								//Remove node if new position creates a deadend (uncomment code below)
-								if(g_options.node_check_deadends
-									&& game_check_deadends(info,&child->state) == 1){
-									free(child);
-									continue;
+								//Remove node if new position
+                                //creates a deadend (uncomment code below)
+                    if(g_options.node_check_deadends
+                        && game_check_deadends(info,&child->state) == 1){
+                        free(child);
+                        continue;
 
-								}
+                    }
 
 								//Check if game is solved (uncomment code below)
-								if ( is_solved(child, info) ) {
-									result = SEARCH_SUCCESS;
-									solution_node = child;
-									*final_state = solution_node->state;
-									break;
-								}
+                    if ( is_solved(child, info) ) {
+                        result = SEARCH_SUCCESS;
+                        solution_node = child;
+                        *final_state = solution_node->state;
+                        break;
+                    }
 
 								//Add child to the queue
-								heapq_enqueue(&pq, child);
+                    heapq_enqueue(&pq, child);
             }
         }
 

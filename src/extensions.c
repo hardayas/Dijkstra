@@ -111,10 +111,10 @@ int game_check_deadends(const game_info_t* info,
 
 	size_t colour = state->last_color;
 
-																	// gives the current position in the state
+                                    // gives the current position in the state
 	pos_t current_pos = state->pos[colour];
 
-																	//check in surrounding positions for dead-ends
+                                    //check in all dirs for dead-ends
 	int dir, MAX_DIRS = 4;
 	for(dir=0; dir<MAX_DIRS; dir++) {
 		pos_t off_pos = pos_offset_pos(info, current_pos, dir);
@@ -122,7 +122,7 @@ int game_check_deadends(const game_info_t* info,
 		if(off_pos != INVALID_POS &&
 		    state->cells[off_pos] == 0) {
 
-																	//if the off_pos is dead-end, return true
+                                    //if the off_pos is dead-end, return true
 					if(off_pos_deadend(info, state, off_pos)) return 1;
 
 				}
@@ -136,33 +136,30 @@ int game_check_deadends(const game_info_t* info,
 // the game.
 int off_pos_deadend(const game_info_t* info, const game_state_t* state,
                     pos_t off_pos) {
+    int free = 0;                          // initially set free spots to zero
 
-  int free = 0;														// initially set free spots to zero
-
-	int dir, MAX_DIRS = 4;
-  for (dir = 0; dir < MAX_DIRS; dir++) {	// consider all offsets(pos) 4 dirs
+    int dir, MAX_DIRS = 4;
+    for (dir = 0; dir < MAX_DIRS; dir++) {
 
     pos_t neighbour = pos_offset_pos(info, off_pos, dir);
 
-    if (neighbour != INVALID_POS && 			// if neighbour is inside the game
-				state->cells[neighbour] == 0) {		// and is free, increment freespace
+    if (neighbour != INVALID_POS && 	  // if neighbour is inside the game
+        state->cells[neighbour] == 0) {   // and is free, increment freespace
         free++;
 
-    } else { 														  // otherwise need to check colours
+    } else { 							  // otherwise need to check colours
         for (size_t colour = 0; colour < info->num_colors; colour++) {
-          if (state->completed & (1 << colour)) {
-            continue;
-          }																// if neighbour is of same
-																					// colour or has same goal, increment
+                                          // if neighbour is of same
+                                          // colour or has same goal, increment
           if (neighbour == state->pos[colour] ||
               neighbour == info->goal_pos[colour]) {
-          	free++;
+              free++;
           }
         }
       }
-		}
+    }
 
-  if(free <= 1) return 1;
-	return 0;															// deadend if only 1 or less freespace
+    if(free <= 1) return 1;
+	return 0;							  // deadend if only 1 or less freespace
 
 }

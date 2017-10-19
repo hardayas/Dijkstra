@@ -143,11 +143,11 @@ int off_pos_deadend(const game_info_t* info, const game_state_t* state,
 
     pos_t neighbour = pos_offset_pos(info, off_pos, dir);
 
-    if (neighbour != INVALID_POS && 	  // if neighbour is inside the game
+    if (neighbour != INVALID_POS &&       // if neighbour is inside the game
         state->cells[neighbour] == 0) {   // and is free, increment freespace
         free++;
 
-    } else { 							  // otherwise need to check colours
+    } else {                              // otherwise need to check colours
         for (size_t colour = 0; colour < info->num_colors; colour++) {
                                           // if neighbour is of same
                                           // colour or has same goal, increment
@@ -160,6 +160,6 @@ int off_pos_deadend(const game_info_t* info, const game_state_t* state,
     }
 
     if(free <= 1) return 1;
-	return 0;							  // deadend if only 1 or less freespace
+	return 0;                             // deadend if only 1 or less freespace
 
 }

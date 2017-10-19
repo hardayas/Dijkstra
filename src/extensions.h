@@ -17,8 +17,7 @@ void game_order_colors(game_info_t* info, game_state_t* state);
 
 int game_check_deadends(const game_info_t* info, const game_state_t* state);
 
-int game_is_deadend(const game_info_t* info,
-                    const game_state_t* state,
+int off_pos_deadend(const game_info_t* info,  const game_state_t* state,
                     pos_t pos);
 
 #endif

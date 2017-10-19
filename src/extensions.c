@@ -109,16 +109,22 @@ void game_order_colors(game_info_t* info,
 int game_check_deadends(const game_info_t* info,
                         const game_state_t* state) {
 
-	size_t color = state->last_color;
+	size_t colour = state->last_color;
 
-	pos_t cur_pos = state->pos[color];
+	//gives the current position in the state
+	pos_t current_pos = state->pos[colour];
 
-	int i = 0;
-	for(i=0; i<4; i++) {
-		pos_t off_pos = pos_offset_pos(info, cur_pos, i);
+	//check in surrounding positions for dead-ends
+	int dir, MAX_DIRS = 4;
+	for(dir=0; dir<MAX_DIRS; dir++) {
+		pos_t off_pos = pos_offset_pos(info, current_pos, dir);
+
 		if(off_pos != INVALID_POS &&
 		    state->cells[off_pos] == 0) {
-					if(game_is_deadend(info, state, off_pos)) return 1;
+
+					//if the off_pos is dead-end, return true
+					if(off_pos_deadend(info, state, off_pos)) return 1;
+
 				}
 	}
 
@@ -127,37 +133,39 @@ int game_check_deadends(const game_info_t* info,
 }
 
 //check .h file
-int game_is_deadend(const game_info_t* info,
-                    const game_state_t* state,
-                    pos_t pos) {
+int off_pos_deadend(const game_info_t* info, const game_state_t* state,
+                    pos_t off_pos) {
 
-  assert(pos != INVALID_POS && !state->cells[pos]);
+	//get the coords for the that position
 
-  int x, y;
-  pos_get_coords(pos, &x, &y);
 
-  int num_free = 0;
+  int free = 0;
 
+	//for all offsets(pos) 4 dirs
   for (int dir=0; dir<4; ++dir) {
-    pos_t neighbor_pos = offset_pos(info, x, y, dir);
-    if (neighbor_pos != INVALID_POS) {
-      if (!state->cells[neighbor_pos]) {
-        ++num_free;
-      } else {
-        for (size_t color=0; color<info->num_colors; ++color) {
+
+    pos_t neighbor = pos_offset_pos(info, off_pos, dir);
+		//if neighbor_pos is inside the game
+    if (neighbor != INVALID_POS) {
+			//if neighbor_pos cell is free
+      if (state->cells[neighbor] == 0) {
+        free++;
+      } else { // otherwise if the neighbor_pos...
+        for (size_t color=0; color < info->num_colors; ++color) {
           if (state->completed & (1 << color)) {
             continue;
           }
-          if (neighbor_pos == state->pos[color] ||
-              neighbor_pos == info->goal_pos[color]) {
-            ++num_free;
+					// has the same colour of the current pos
+					// or it is the goal pos
+          if (neighbor == state->pos[color] ||
+              neighbor == info->goal_pos[color]) {
+          	free++;
           }
         }
-
       }
     }
   }
 
-  return num_free <= 1;
+  return free <= 1;
 
 }
